@@ -8,7 +8,7 @@ such as compand, then normalized and then combined into downmix with equal
 volume. Sessions are named by the time of recording in YYYYMMDD-HHMMSS format.
 
 Intended use is to quickly generate mp3 previews of live multitrack music
-recordings (such as rehersals or live performances), created by some sound
+recordings (such as rehearsals or live performances), created by some sound
 recording software (Avid ProTools or Audacity for example).
 
 Livemix uses SoX sound processing utity to do all the work with tracks
