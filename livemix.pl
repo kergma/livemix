@@ -1,4 +1,22 @@
 #!/usr/bin/perl
+q\
+Livemix, an automated live multitrack sound recordings downmixer
+Copyright (c) 2013 by Sergey Pushkin <pushkinsv@gmail.com>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>
+\;
+
 use strict;
 use File::Find;
 use File::Basename;
@@ -8,6 +26,13 @@ use Cwd 'realpath';
 use Getopt::Long;
 use Date::Format;
 use Date::Parse;
+
+print q\Livemix Copyright (C) 2013 Sergey Pushkin
+This program comes with ABSOLUTELY NO WARRANTY.
+This is free software, and you are welcome to redistribute it
+under certain conditions; see COPYING file for details.
+
+\;
 
 my ($wav,$mp3,$start_from,$silence_thr,$sox,$format,$lame,$help);
 my @effects;
@@ -24,7 +49,7 @@ GetOptions (
 );
 if ($help)
 {
-	print "$0 [-h|--help] [--wav] [--mp3] [--start-from=datetime] [--silence-threshold=number] [--effect=[!]regex,effect,args] [--sox=path args] [--lame=path args] [source dir] [target dir]\n";
+	print "$0 [-h|--help] [--wav] [--mp3] [--format=output format] [--start-from=datetime] [--silence-threshold=number] [--effect=[!]regex,effect,args] [--sox=path args] [--lame=path args] [source dir] [target dir]\n";
 	exit;
 };
 
