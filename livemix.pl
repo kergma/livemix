@@ -99,6 +99,12 @@ my @lame=($1,split /\s+/,$3) if $lame=~/^(.*lame(\.exe|))\s*(.*)$/i;
 $format||='--bits=16 --rate=44100';
 my @format=split /\s+/,$format;
 
+my $formats='wav au';
+my $soxhelp=`$sox[0] --help`;
+$formats=$1 if $soxhelp =~ /AUDIO FILE FORMATS: (.*?)$/smi;
+
+$formats=join('|',split / /,$formats);
+
 my %files;
 find( {wanted => sub {
 	my $filename=basename($File::Find::name);
@@ -106,8 +112,7 @@ find( {wanted => sub {
 	my $mtime=stat($File::Find::name)->[9];
 	push @{$files{$File::Find::dir}{$size}},
 		{name=>$filename, size=>$size, mtime=>$mtime}
-		#if basename($File::Find::dir) eq 'Audio Files' and $filename =~ /\.wav/i and $mtime>$start_from;
-		if $filename =~ /\.wav/i and $mtime>$start_from;
+		if $filename =~ /\.($formats)/i and $mtime>$start_from;
 }, no_chdir => 1}, $source);
 
 my %sessions;

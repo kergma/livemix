@@ -1,6 +1,6 @@
 Livemix is a tool for automated downmixing of live multitrack sound recordings.
 
-Livemix will search directory tree for wav files, assuming each of them is a 
+Livemix will search directory tree for audio files, assuming each of them is a 
 separate track, then group them into sessions based on file size, and then
 create a downmix for each session.
 Silent tracks are ignored, the others are processed by applying some effects
@@ -9,7 +9,7 @@ volume. Sessions are named by the time of recording in YYYYMMDD-HHMMSS format.
 
 Intended use is to quickly generate mp3 previews of live multitrack music
 recordings (such as rehersals or live performances), created by some sound
-recording software (Avid ProTools for example).
+recording software (Avid ProTools or Audacity for example).
 
 Livemix uses SoX sound processing utity to do all the work with tracks
 preprocessing and mixing, and LAME mp3 encoder to produce final mp3 file.
@@ -66,6 +66,14 @@ livemix.exe "C:\ProTools Sessions" "C:\livemixed" ^
 	"--lame=lame --quiet --abr 192"
 
 no trailing backslash in paths!
+
+Invocation example, on unix:
+
+./livemix.pl ~/recordings/ ~/livetest/ \
+        --start-from=2013-01-01 \
+        --silence-threshold=0.2 \
+        "--effect=,compand 0.2,1 -70,-60,-30,-30,-20,-10,-20,-5,-50 -5 -90 0.2" \
+        "--lame=lame --quiet --abr 192"
 
 --
 Sergey Pushkin <pushkinsv@gmail.com>
