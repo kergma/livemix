@@ -1,4 +1,71 @@
-livemix is a tool for automated downmixing of live multitrack sound recordings.
+Livemix is a tool for automated downmixing of live multitrack sound recordings.
+
+Livemix will search directory tree for wav files, assuming each of them is a 
+separate track, then group them into sessions based on file size, and then
+create a downmix for each session.
+Silent tracks are ignored, the others are processed by applying some effects
+such as compand, then normalized and then combined into downmix with equal
+volume. Sessions are named by the time of recording in YYYYMMDD-HHMMSS format.
+
+Intended use is to quickly generate mp3 previews of live multitrack music
+recordings (such as rehersals or live performances), created by some sound
+recording software (Avid ProTools for example).
+
+Livemix uses SoX sound processing utity to do all the work with tracks
+preprocessing and mixing, and LAME mp3 encoder to produce final mp3 file.
+Therefore, livemix needs sox and lame executables to be in search path
+or in the same dir as livemix executable.
+
+Help on switches:
+
+./livemix.pl [-h|--help] [--wav] [--mp3] [--format=output format]
+	[--start-from=datetime]	[--silence-threshold=number]
+	[--effect=[!]regex,effect,args] [--sox=path args] [--lame=path args] 
+	[source dir] [target dir]
+
+<source dir> : path to directory where to search for track wav files, 
+	current directory is the default
+
+<target dir> : path to directory where to place resulting files,
+	current directory is the default
+
+--wav, --mp3 : output format, you can specify any, both or nothing of these,
+	mp3 is the default
+
+--format : output format for resulting wav file,
+	default is "--bits=16 --rate=44100", see sox documentation for details
+
+--start-from : time in YYYY-MM-DD[ HH:MM:SS] format, the tracks recorded
+	earlier this moment will be ignored. if not specified, start time
+	will be taken from the last YYYYMMDD-HHMMSS file in target dir.
+
+--silence-threshold : is the minimum value for difference between maximum and
+	minimum amplitudes in a track to consider it as a silence
+
+--effect : effect specification, consists of regular expression to filter
+	track by filename and sox effect specification to apply to track.
+	filter expression may be negated by ! exclamation sign at the beginning.
+	You can specify any number of effects. The default behaviour is to
+	apply the same compression to all tracks. For list of effects and
+	their specification syntax see SoX documentation.
+
+--sox : path and parameters to pass to sox executable, 
+	default is "sox --combine=mix --norm=-3". You can change this to specify
+	sox location in your system or to change tracks combining parameters.
+
+--lame : path and parameters to pass to lame executable,
+	default is "lame --quiet --abr 160". Change this to specify lame
+	location in your system or bitrate of resulting mp3 file.
+
+Invocation example, on windows:
+
+livemix.exe "C:\ProTools Sessions" "C:\livemixed" ^
+	--start-from=2013-01-01 ^
+	--silence-threshold=0.2 ^
+	"--effect=,compand 0.2,1 -70,-60,-30,-30,-20,-10,-20,-5,-50 -5 -90 0.2" ^
+	"--lame=lame --quiet --abr 192"
+
+no trailing backslash in paths!
 
 --
 Sergey Pushkin <pushkinsv@gmail.com>
