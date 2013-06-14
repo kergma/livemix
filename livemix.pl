@@ -105,12 +105,12 @@ $formats=$1 if $soxhelp =~ /AUDIO FILE FORMATS: (.*?)$/smi;
 
 $formats=join('|',split / /,$formats);
 
-my %files;
+my (%files, $total_files, $files_read);
 find( {wanted => sub {
 	my $filename=basename($File::Find::name);
 	my $size=-s $File::Find::name;
 	my $mtime=stat($File::Find::name)->[9];
-	push @{$files{$File::Find::dir}{$size}},
+	++$total_files and push @{$files{$File::Find::dir}{$size}},
 		{name=>$filename, size=>$size, mtime=>$mtime}
 		if $filename =~ /\.($formats)/i and $mtime>$start_from;
 }, no_chdir => 1}, $source);
@@ -121,13 +121,13 @@ foreach my $d (keys %files)
 	foreach my $s (keys %{$files{$d}})
 	{
 		my $f=$files{$d}{$s};
-		next if scalar(@$f)<2;
+		$total_files-- xor next if scalar(@$f)<2;
 
 		my $S={dir=>$d,files=>[@$f],endtime=>min(map {$_->{mtime}} @$f)};
 		$sessions{"$d-$s"}=$S;
 		foreach my $f (@{$files{$d}{$s}})
 		{
-			print "reading $f->{name}\n";
+			printf "reading $f->{name} (%d left)\n",$total_files-++$files_read;
 			my $stat=`$sox[0] "$d/$f->{name}" -n stat 2>&1`;
 			my ($max,$min);
 			$max=$1 if $stat=~/Maximum amplitude:\s+(\S+)/;
@@ -159,7 +159,8 @@ foreach my $d (keys %files)
 	};
 };
 
-foreach my $s (values %sessions)
+my $sessions_mixed;
+foreach my $s (sort {$a->{endtime}-$a->{duration}<=>$b->{endtime}-$b->{duration}} values %sessions)
 {
 	$s->{name}=time2str('%Y%m%d-%H%M%S',$s->{endtime}-$s->{duration});
 	foreach my $f (@{$s->{files}})
@@ -191,7 +192,7 @@ foreach my $s (values %sessions)
 		$f->{v}=$f->{volume}/scalar(@{$s->{files}});
 		$f->{v}/=2 and print "halfing volume for $f->{name}\n" if $f->{name}=~/\.(L|R)\./;
 	};
-	print "mixing $s->{name}.wav\n";
+	printf "mixing $s->{name}.wav (%d left)\n",scalar(keys %sessions)-++$sessions_mixed;
 
 	system @sox, map(("-v $_->{v}",$_->{tempname}), @{$s->{files}}), @format, "$target/$s->{name}.wav";
 	foreach my $f (@{$s->{files}})
